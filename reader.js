@@ -31,12 +31,13 @@ class Reader {
 			margin: 'auto',
 		});
 		options.container.append(this.container);
-		
-		try {
-			this.currpage = JSON.parse(localStorage.currpage);
-		} catch (e) {
-			this.currpage = {};
-		}
+
+		this.currpage = {};
+//		try {
+//			this.currpage = JSON.parse(localStorage.currpage);
+//		} catch (e) {
+//			this.currpage = {};
+//		}
 		
 		if (!this.currpage[this.comicsPath])
 			this.currpage[this.comicsPath] = 0;
@@ -72,7 +73,7 @@ class Reader {
 			page = (this.comicsPath in this.currpage) ? this.currpage[this.comicsPath] : 0;
 		
 		this.currpage[this.comicsPath] = page;
-		localStorage.currpage = JSON.stringify(this.currpage);
+//		localStorage.currpage = JSON.stringify(this.currpage);
 		
 		if (this.comic) {
 			this.kumikoReady();
@@ -148,7 +149,7 @@ class Reader {
 		panel.addClass('zoomTarget');
 		
 		this.container.addClass('zoomed');
-		this.container.animate(newcss,300,callback);
+		this.container.animate(newcss,0,callback);
 	}
 	
 	dezoom () {

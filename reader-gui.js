@@ -53,12 +53,14 @@ $(document).keydown(function(e) {
 	switch(e.which) {
 		case 37: // left
 		case 38: // up
-			$('#result .prevPanel').click();
+//			$('#result .prevPanel').click();
+			reader.loadPrevPage();
 			break;
 
 		case 39: // right
 		case 40: // down
-			$('#result').click();
+//			$('#result').click();
+		reader.loadNextPage();
 			break;
 		
 		case 80: // 'p' key
@@ -101,4 +103,10 @@ $(document).on('kumiko-ready', function () {
 		var sel = page == reader.getCurrentPage() ? 'selected="selected"' : '';
 		$('.pagesel').append('<option value="'+page+'" '+sel+'>'+(parseInt(page)+1)+'/'+pages.length+(page == reader.getCurrentPage() ? ' *' : '')+'</option>');
 	}
+});
+
+$(document).on('page-changed', function () {
+	$('input[name=panelview]').checked = false
+	$('.menu').toggleClass('hidden');
+	reader.dezoom();
 });

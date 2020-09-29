@@ -11,15 +11,15 @@
 	
 	<style type="text/css">
 		#result {
-			width:  100%;
-			height: 100%;
+			width:  70%;
+			height: 70%;
 		}
 	</style>
 </head>
 
 <body>
 	
-	<div id="result">
+	<div id="result" class="debug">
 		<i class="tools prevPanel">←</i>
 	</div>
 	<div class="menu">
@@ -36,9 +36,12 @@
 	</div>
 	
 	<script type="text/javascript">
-		var json_file = 'xkcd.json';
-		var img_urls = ['doc/regular_expressions.png'];
+		var img_urls = ['test.png'];
+		var json_file = 'test.json';
 	</script>
+
+	<label><input type="checkbox" onclick="$(&quot;#result&quot;).toggleClass(&quot;debug&quot;);" checked="checked">show
+		panels (full-page view only)</label>
 	<script type="text/javascript" src="reader.js"></script>
 	<script type="text/javascript" src="reader-gui.js"></script>
 	

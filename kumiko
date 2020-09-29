@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-
-
+import shutil
 import sys, os, json
 import argparse
 from kumikolib import Kumiko
 
 
+print ("The script has the name %s" % (sys.argv[0]))
 parser = argparse.ArgumentParser(description='Kumiko CLI')
 
 # Utilities
@@ -17,25 +17,50 @@ parser.add_argument('-o', '--output', nargs=1, help='A file name to save out to'
 
 
 args = parser.parse_args()
+print(args)
 k = Kumiko({
 	'debug': args.debug
 })
 
+testDir = "test\\"
+
 file_or_folder = args.input[0]
+print("args input " + file_or_folder)
+if os.path.isfile(file_or_folder):
+	testImgName = testDir + "test.png"
+	shutil.copy2(file_or_folder, testImgName)
+	file_or_folder = testDir
 
 if os.path.isdir(file_or_folder):
+	fileList = k.listAllFile(file_or_folder)
 	info = k.parse_dir(file_or_folder)
 elif os.path.isfile(file_or_folder):
+	fileList = [file_or_folder]
 	info = k.parse_images([file_or_folder])
 else:
-	print "--input (-i) is not a file or directory: '"+file_or_folder+"'"
+	print("--input (-i) is not a file or directory: '"+file_or_folder+"'")
 	sys.exit()
 
 info = json.dumps(info)
 
 if args.output:
-	f = open(args.output[0], 'w')
+	outputPath = args.output[0]
+	if os.path.isdir(file_or_folder):
+		outputPath = file_or_folder + "\\" + outputPath
+	f = open(outputPath, 'w')
 	f.write(info)
 	f.close()
+	print("output json path = " + outputPath)
 
-print info
+	html_out_path = "test_xkcd.html"
+	if os.path.isdir(file_or_folder):
+		html_out_path = file_or_folder + "\\" + html_out_path
+	f = open(html_out_path, 'w')
+	f.write(k.get_html_content(fileList.__str__()))
+	f.close()
+	print("output img path list = " + html_out_path)
+
+	if not args.debug:
+		os.system('"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" --allow-file-access-from-files ' + os.path.abspath(html_out_path))
+
+print(info)
