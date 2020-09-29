@@ -338,6 +338,7 @@ def cutRectByExcludingRegions2(sourceRect: list, excludingRectList: list):
         outBound[1] = bottom
 
     print("size = {}".format(len(result)))
+    result.sort(key=functools.cmp_to_key(sortRect))
     for rect in result:
         print("cutRectByExcludingRegions: {}".format(rect))
     return result

@@ -172,6 +172,7 @@ def analyzeContours(contours, img, debug):
         cvShowWait(img)
 
     smallBlockRectList, remainBlockRectList = mergeSmallContours(smallBoundingRects, contentBoundingRect, mainBlockRectList)
+    splitByRowAndCol(contentBoundingRect, mainBlockRectList)
     if debug:
         cvRectList(remainBlockRectList, img, False)
         cvShowWait(img)
@@ -225,8 +226,62 @@ def getAllBoundingRect(contours):
     return rects
 
 
+def splitByRowAndCol(contentBoundingRect, mainBlockRectList):
+    mainBlockBoundingRect = []
+    for mainRect in mainBlockRectList:
+        if len(mainBlockBoundingRect) == 0:
+            mainBlockBoundingRect = mainRect
+        else:
+            mainBlockBoundingRect = OnyxRectUtils.combineRect(mainBlockBoundingRect, mainRect)
+
+    rowBlockRectList = OnyxRectUtils.cutRectByExcludingRegions2(contentBoundingRect, mainBlockRectList)
+    colBlockRectList = OnyxRectUtils.cutRectByExcludingRegions(contentBoundingRect, mainBlockRectList)
+
+    rowList = []
+    for rowRect in rowBlockRectList:
+        if rowRect[0] == mainBlockBoundingRect[0] and rowRect[1] > mainBlockBoundingRect[1] \
+                and rowRect[2] == mainBlockBoundingRect[2] and rowRect[3] < mainBlockBoundingRect[3]:
+            rowList.append(rowRect)
+
+    colList = []
+    for colRect in colBlockRectList:
+        if colRect[0] > mainBlockBoundingRect[0] and colRect[1] == mainBlockBoundingRect[1] \
+                and colRect[2] < mainBlockBoundingRect[2] and colRect[3] == mainBlockBoundingRect[3]:
+            colList.append(colRect)
+
+    rowBlockCount = len(rowList) + 1
+    colBlockCount = len(colList) + 1
+    print("splitByRowAndCol, rowList:{}, colList:{}".format(rowBlockCount, colBlockCount))
+
+    if len(colList) == 0:
+        return rowList
+
+    blockRectList = []
+    for row in range(rowBlockCount):
+        for col in range(colBlockCount):
+            if col == 0:
+                left = contentBoundingRect[0]
+            else:
+                left = colList[col-1][0]
+            if row == 0:
+                top = contentBoundingRect[1]
+            else:
+                top = rowList[row-1][3]
+            if col == colBlockCount - 1:
+                right = contentBoundingRect[2]
+            else:
+                right = colList[col][0]
+            if row == rowBlockCount - 1:
+                bottom = contentBoundingRect[3]
+            else:
+                bottom = rowList[row][1]
+            blockRect = [left, top, right, bottom]
+            print("blockRect:{}".format(blockRect))
+            blockRectList.append(blockRect)
+
+
 def mergeSmallContours(smallBoundingRects, contentBoundingRect, mainBlockRectList):
-    remainBlockRectList = OnyxRectUtils.cutRectByExcludingRegions2(contentBoundingRect, mainBlockRectList)
+    remainBlockRectList = OnyxRectUtils.cutRectByExcludingRegions(contentBoundingRect, mainBlockRectList)
     remainBlockRectMap = {}
 
     index = -1
